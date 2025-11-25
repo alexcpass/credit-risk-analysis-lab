@@ -1,0 +1,22 @@
+SELECT 
+    -- 1. Cria as Gerações
+    CASE 
+        WHEN YEAR(CURDATE()) - YEAR(c.data_nascimento) <= 28 THEN '1. Geração Z (Até 28)'
+        WHEN YEAR(CURDATE()) - YEAR(c.data_nascimento) BETWEEN 29 AND 44 THEN '2. Millennials (29-44)'
+        WHEN YEAR(CURDATE()) - YEAR(c.data_nascimento) BETWEEN 45 AND 60 THEN '3. Geração X (45-60)'
+        ELSE '4. Boomers (60+)'
+    END as geracao,
+
+    -- 2. Agrupa também pela finalidade (Isso resolve o erro 1055)
+    e.finalidade,
+
+    -- 3. Métricas
+    COUNT(e.emprestimo_id) as qtd_contratos,
+    SUM(e.valor_aprovado) as volume_aprovado,
+    ROUND(AVG(c.renda_mensal), 2) as renda_media_grupo
+
+FROM clientes c
+JOIN emprestimos e ON c.cliente_id = e.cliente_id
+WHERE e.status_emprestimo = 'Aprovado'
+GROUP BY 1, 2 -- Agrupa por Geração (1) e Finalidade (2)
+ORDER BY 1 ASC, volume_aprovado DESC;

@@ -1,0 +1,9 @@
+SELECT 
+    c.estado,
+    SUM(e.valor_aprovado) as total_aprovado
+FROM clientes c
+JOIN emprestimos e ON c.cliente_id = e.cliente_id
+WHERE e.status_emprestimo = 'Aprovado'
+GROUP BY c.estado
+ORDER BY total_aprovado DESC
+LIMIT 10;
